@@ -61,9 +61,9 @@ namespace SHF.GenericController
                 return;
 
             var genericType = controller.ControllerType.GenericTypeArguments[0];
-            var customNameAttribute = genericType.GetCustomAttribute<AutoRouteAttribute>();
+            var attribute = genericType.GetCustomAttribute<AutoRouteAttribute>();
 
-            if (customNameAttribute?.Route == null)
+            if (attribute?.Route == null)
             {
                 controller.ControllerName = genericType.Name;
                 return;
@@ -71,7 +71,7 @@ namespace SHF.GenericController
 
             controller.Selectors.Add(new SelectorModel
             {
-                AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(customNameAttribute.Route)),
+                AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(attribute.Route)),
             });
         }
     }
