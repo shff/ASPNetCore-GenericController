@@ -4,9 +4,9 @@ Provides a way to use a generic controller parametrizable with routeable models.
 
 ### Usage
 
-Just add a generic controller annotated with `[GenericController]` and call `app.UseGenericController()` in your `ConfigureServices` method to wire it up.
+Just add a generic controller and then call `app.UseGenericController()` in your `ConfigureServices` method to wire it up.
 
-Models should be annotated with the `[AutoRoute]` attribute.
+Models should be annotated with the built-in `[Route]` attribute.
 
 ```
 using SHF.GenericController
@@ -19,13 +19,12 @@ public class Startup
   }
 }
 
-[GenericController]
 public class MainController<TModel>
 {
   // ...
 }
 
-[AutoRoute("/route")]
+[Route("/route")]
 public class SomeModel
 {
 }
