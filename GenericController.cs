@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,14 +12,11 @@ namespace SHF.GenericController
 {
     public static class ServiceCollectionExtensions
     {
-        public static void UseGenericController(this IServiceCollection services, Type controllerType)
+        public static void UseGenericController(this IServiceCollection services)
         {
-            services.
-                AddMvc(o => o.Conventions.Add(new RouteConvention())).
-                ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new FeatureProvider {
-                    ControllerType = controllerType,
-                    Assembly = controllerType.Assembly,
-                }));
+            services
+                .AddMvc(o => o.Conventions.Add(new RouteConvention()))
+                .ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new FeatureProvider()));
         }
     }
 
@@ -34,20 +31,24 @@ namespace SHF.GenericController
         }
     }
 
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public class GenericControllerAttribute : Attribute
+    {
+    }
+
     public class FeatureProvider : IApplicationFeatureProvider<ControllerFeature>
     {
-        public Type ControllerType { get; set; }
-        public Assembly Assembly { get; set; }
-
         public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
         {
-            foreach (var type in Assembly.GetExportedTypes())
+            var classes = Assembly.GetEntryAssembly().DefinedTypes;
+
+            var models = classes.Where(a => a.GetCustomAttributes<AutoRouteAttribute>().Any());
+            var controller = classes.Single(a => a.GetCustomAttributes<GenericControllerAttribute>().Any());
+
+            foreach (var model in models)
             {
-                if (type.GetCustomAttributes<AutoRouteAttribute>().Any())
-                {
-                    var typeInfo = this.ControllerType.MakeGenericType(type).GetTypeInfo();
-                    feature.Controllers.Add(typeInfo);
-                }
+                var typeInfo = controller.MakeGenericType(model).GetTypeInfo();
+                feature.Controllers.Add(typeInfo);
             }
         }
     }
