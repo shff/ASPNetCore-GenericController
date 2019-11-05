@@ -27,8 +27,9 @@ namespace SHF.GenericController
             var classes = Assembly.GetEntryAssembly().DefinedTypes;
 
             var models = classes.Where(a => a.GetCustomAttributes<RouteAttribute>().Any());
-            var controller = classes.Single(a => a.IsClass && a.IsPublic
-                && a.ContainsGenericParameters && a.Name.Contains("Controller"));
+            var controller = classes.Single(a => a.IsClass && a.IsPublic &&
+                a.ContainsGenericParameters && (a.Name.Contains("Controller")
+                    || a.IsDefined(typeof(ControllerAttribute))));
 
             foreach (var model in models)
             {
