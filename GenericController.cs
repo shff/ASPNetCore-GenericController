@@ -20,30 +20,15 @@ namespace SHF.GenericController
         }
     }
 
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class AutoRouteAttribute : Attribute
-    {
-        public string Route { get; set; }
-
-        public AutoRouteAttribute(string route)
-        {
-            Route = route;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class GenericControllerAttribute : Attribute
-    {
-    }
-
     public class FeatureProvider : IApplicationFeatureProvider<ControllerFeature>
     {
         public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
         {
             var classes = Assembly.GetEntryAssembly().DefinedTypes;
 
-            var models = classes.Where(a => a.GetCustomAttributes<AutoRouteAttribute>().Any());
-            var controller = classes.Single(a => a.GetCustomAttributes<GenericControllerAttribute>().Any());
+            var models = classes.Where(a => a.GetCustomAttributes<RouteAttribute>().Any());
+            var controller = classes.Single(a => a.IsClass && a.IsPublic
+                && a.ContainsGenericParameters && a.Name.Contains("Controller"));
 
             foreach (var model in models)
             {
@@ -61,9 +46,9 @@ namespace SHF.GenericController
                 return;
 
             var genericType = controller.ControllerType.GenericTypeArguments[0];
-            var attribute = genericType.GetCustomAttribute<AutoRouteAttribute>();
+            var attribute = genericType.GetCustomAttribute<RouteAttribute>();
 
-            if (attribute?.Route == null)
+            if (attribute?.Template == null)
             {
                 controller.ControllerName = genericType.Name;
                 return;
@@ -71,7 +56,7 @@ namespace SHF.GenericController
 
             controller.Selectors.Add(new SelectorModel
             {
-                AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(attribute.Route)),
+                AttributeRouteModel = new AttributeRouteModel(new RouteAttribute(attribute.Template)),
             });
         }
     }
