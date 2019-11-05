@@ -1,31 +1,32 @@
 # GenericController
 
-Provides a way to use a generic controller parametrizable with classes marked with a certain attribute.
+Provides a way to use a generic controller parametrizable with routeable models.
 
 ### Usage
 
-Just add a generic controller with one generic parameter and use the `app.useGenericController` function to wire it up.
+Just add a generic controller annotated with `[GenericController]` and call `app.UseGenericController()` in your `ConfigureServices` method to wire it up.
+
+Models should be annotated with the `[AutoRoute]` attribute.
 
 ```
 using SHF.GenericController
 
 public class Startup
 {
-  public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+  public void ConfigureServices(IServiceCollection services)
   {
-    // your startup code
-    
-    app.useGenericController(typeof(GenericController<>));
+      services.UseGenericController();
   }
+}
+
+[GenericController]
+public class MainController<TModel>
+{
+  // ...
 }
 
 [AutoRoute("/route")]
 public class SomeModel
 {
-}
-
-public class GenericController<TModel>
-{
-  // ...
 }
 ```
