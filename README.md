@@ -12,7 +12,7 @@ public class MainController<TModel>
 }
 ```
 
-Next, create models and annotate them with the regular `[Route]` attribute.
+Next, create models and annotate them with the regular `[Route]` attribute. Anything annotated with `[Route]` that is not a controller will be discovered by the library.
 
 ```
 [Route("/route")]
