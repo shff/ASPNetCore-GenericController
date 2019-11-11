@@ -4,7 +4,7 @@ Provides a way to use a generic controller parametrizable with routeable models.
 
 ### Usage
 
-Start by creating a class with a single generic parameter that either has `Controller` in its name, inherits from `Controller` or has the `[Controller]` attribute:
+Start by creating a class with a single generic parameter that either has `Controller` in its name, inherits from `Controller` or has the `[Controller]` attribute. You have to use just one single generic controller.
 
 ```
 public class MainController<TModel>
@@ -12,25 +12,23 @@ public class MainController<TModel>
 }
 ```
 
-Next, call `app.UseGenericController()` in your `ConfigureServices` method to wire it up.
-
-Models should be annotated with the built-in `[Route]` attribute.
-
-```
-using SHF.GenericController
-
-public void ConfigureServices(IServiceCollection services)
-{
-  services.UseGenericController();
-}
-```
-
-Last,  but not least, create models and annotate them with the regular `[Route]` attribute.
+Next, create models and annotate them with the regular `[Route]` attribute.
 
 ```
 [Route("/route")]
 public class SomeModel
 {
+}
+```
+
+Last, but not least, call `app.UseGenericController()` in your `ConfigureServices` method to wire it up. This package will discover the controller and the models and wire up everything.
+
+```
+using SHF.GenericController;
+
+public void ConfigureServices(IServiceCollection services)
+{
+  services.UseGenericController();
 }
 ```
 
