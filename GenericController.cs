@@ -32,10 +32,15 @@ namespace SHF.GenericController
             var models = classes.Where(a => !a.Name.Contains("Controller")
                 && !a.IsDefined(typeof(ControllerAttribute))
                 && a.GetCustomAttributes<RouteAttribute>().Any());
-            var controller = classes.Single(a => a.IsClass
+            var controller = classes.SingleOrDefault(a => a.IsClass
                 && a.IsPublic
                 && a.ContainsGenericParameters
                 && (a.Name.Contains("Controller") || a.IsDefined(typeof(ControllerAttribute))));
+
+            if (controller == null)
+            {
+                throw new Exception("Cannot find a Generic Controller");
+            }
 
             foreach (var model in models)
             {
@@ -82,5 +87,4 @@ namespace SHF.GenericController
             }.Union(viewLocations);
         }
     }
-
 }
