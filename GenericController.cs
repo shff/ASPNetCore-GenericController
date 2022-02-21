@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace SHF.GenericController
@@ -17,6 +18,8 @@ namespace SHF.GenericController
             services
                 .AddMvc(o => o.Conventions.Add(new RouteConvention()))
                 .ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new FeatureProvider()));
+            services
+                .Configure<RazorViewEngineOptions>(o => o.ViewLocationExpanders.Add(new GenericViewLocationExpander()));
         }
     }
 
@@ -64,4 +67,20 @@ namespace SHF.GenericController
             });
         }
     }
+
+    public class GenericViewLocationExpander : IViewLocationExpander
+    {
+        public void PopulateValues(ViewLocationExpanderContext context) {}
+
+        public IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
+        {
+            var descriptor = context.ActionContext.ActionDescriptor as ControllerActionDescriptor;
+            var controllerName = descriptor.ControllerTypeInfo.Name.Split('`').First();
+            return new[]
+            {
+                "/Views/" + controllerName + "/{0}.cshtml",
+            }.Union(viewLocations);
+        }
+    }
+
 }
